@@ -29,7 +29,6 @@ async function fetchCandleData(sdk, coin, interval, count) {
 
 // Unified order placement function that handles both order placement and risk management
 async function placeOrder(sdk, config, pair, isBuy) {
-
     console.log('placing ' + (isBuy ? 'buy' : 'sell') + ' order on ' + pair);
 
     // Get L2 book for price information
@@ -37,8 +36,8 @@ async function placeOrder(sdk, config, pair, isBuy) {
 
     // Get the 3rd level price to pass as a market order
     const orderPrice = isBuy ?
-        parseFloat(l2Book.levels[1][3].px) :
-        parseFloat(l2Book.levels[0][3].px);
+        parseFloat(l2Book.levels[1][0].px) :
+        parseFloat(l2Book.levels[0][0].px);
 
     const pairConfig = config.trading.pairs.find(p => p.pair === pair);
     const currencySize = Number((pairConfig.positionSize / orderPrice).toFixed(pairConfig.sizeDecimals));
@@ -58,12 +57,15 @@ async function placeOrder(sdk, config, pair, isBuy) {
     const mainOrderStatus = mainOrderResult.response.data.statuses[0];
     let entryPrice;
     
+    // Update mainOrderId immediately to prevent race conditions with fill events
     if (mainOrderStatus.filled) {
         config.position[pair].mainOrderId = mainOrderStatus.filled.oid;
+        console.log('Main order filled immediately with ID:', config.position[pair].mainOrderId);
         entryPrice = Number(mainOrderStatus.filled.avgPx);
     } else if (mainOrderStatus.resting) {
         config.position[pair].mainOrderId = mainOrderStatus.resting.oid;
-        entryPrice = Number(mainOrderStatus.resting.avgPx);
+        console.log('Main order resting with ID:', config.position[pair].mainOrderId);
+        entryPrice = orderPrice;
     }
 
     // Calculate take profit and stop loss levels
@@ -79,7 +81,7 @@ async function placeOrder(sdk, config, pair, isBuy) {
         Number((entryPrice - takeProfitDistance).toFixed(pairConfig.priceDecimals));
 
     // Place stop loss order
-    await sdk.exchange.placeOrder({
+    const slOrderResult = await sdk.exchange.placeOrder({
         orders: [{
             coin: pair,
             is_buy: !isBuy,
@@ -97,7 +99,7 @@ async function placeOrder(sdk, config, pair, isBuy) {
     });
 
     // Place take profit order
-    await sdk.exchange.placeOrder({
+    const tpOrderResult = await sdk.exchange.placeOrder({
         orders: [{
             coin: pair,
             is_buy: !isBuy,
@@ -113,10 +115,12 @@ async function placeOrder(sdk, config, pair, isBuy) {
             reduce_only: true
         }]
     });
+
 }
 
 // Update performance metrics
 function updatePerformanceMetrics(config, pair, fill) {
+
     const pairTracking = config.tracking[pair];
     pairTracking.totalTrades++;
 
@@ -142,6 +146,7 @@ async function initializeSubscriptions(sdk, config, onCandle, onFill) {
     for (const pair of config.trading.pairs) {
         sdk.subscriptions.subscribeToCandle(pair.pair, config.candles.interval, async (data) => {
             if (!config.position[pair.pair].isInPosition) {
+                console.log('NOT IN POSITION SO CALLING ON CANDLE');
                 await onCandle(pair, data);
             }
         });
