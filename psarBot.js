@@ -68,20 +68,19 @@ async function main() {
                 config.history[pair.pair].candles[config.history[pair.pair].candles.length - 1] = data;
             }
 
-            // Only proceed if we are not in a position
-            if (!config.position[pair.pair].isInPosition) {
-                const currentPrice = parseFloat(data.c);
-                const psar = calculatePSAR(config.history[pair.pair].candles);
-                const ema = calculateEMA(config.history[pair.pair].candles);
+            const currentPrice = parseFloat(data.c);
+            const psar = calculatePSAR(config.history[pair.pair].candles);
+            const ema = calculateEMA(config.history[pair.pair].candles);
 
-                // Trading logic based on PSAR and EMA
-                if (currentPrice > psar /*&& currentPrice > ema*/) {
-                    config.position[pair.pair].isInPosition = true;
-                    await placeOrder(sdk, config, pair.pair, true);
-                } else if (currentPrice < psar /*&& currentPrice < ema*/) {
-                    config.position[pair.pair].isInPosition = true;
-                    await placeOrder(sdk, config, pair.pair, false);
-                }
+            // Trading logic based on PSAR and EMA
+            if (currentPrice > psar /*&& currentPrice > ema*/) {
+                config.position[pair.pair].isInPosition = true;
+                console.log('GONNA PLACE ORDER SO IN POSITION');
+                await placeOrder(sdk, config, pair.pair, true);
+            } else if (currentPrice < psar /*&& currentPrice < ema*/) {
+                config.position[pair.pair].isInPosition = true;
+                console.log('GONNA PLACE ORDER SO IN POSITION');
+                await placeOrder(sdk, config, pair.pair, false);
             }
         }
     }
