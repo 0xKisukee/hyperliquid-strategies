@@ -67,16 +67,18 @@ async function main() {
             }
 
             // Only proceed if we are not in a position
-            if (!config.position[pair].isInPosition) {
+            if (!config.position[pair.pair].isInPosition) {
                 const currentPrice = parseFloat(data.c);
                 const rsi = calculateRSI(config.history[pair.pair].candles);
                 const sma = calculateSMA(config.history[pair.pair].candles);
 
                 // Trading logic
                 if (rsi < config.indicators.rsiOversold && currentPrice > sma) {
-                    await placeOrder(sdk, config, pair.pair, true, currentPrice);
+                    config.position[pair.pair].isInPosition = true;
+                    await placeOrder(sdk, config, pair.pair, true);
                 } else if (rsi > config.indicators.rsiOverbought && currentPrice < sma) {
-                    await placeOrder(sdk, config, pair.pair, false, currentPrice);
+                    config.position[pair.pair].isInPosition = true;
+                    await placeOrder(sdk, config, pair.pair, false);
                 }
             }
         }

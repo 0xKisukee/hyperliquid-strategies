@@ -75,10 +75,12 @@ async function main() {
                 const ema = calculateEMA(config.history[pair.pair].candles);
 
                 // Trading logic based on PSAR and EMA
-                if (currentPrice > psar && currentPrice > ema) {
-                    await placeOrder(sdk, config, pair.pair, true, currentPrice);
-                } else if (currentPrice < psar && currentPrice < ema) {
-                    await placeOrder(sdk, config, pair.pair, false, currentPrice);
+                if (currentPrice > psar /*&& currentPrice > ema*/) {
+                    config.position[pair.pair].isInPosition = true;
+                    await placeOrder(sdk, config, pair.pair, true);
+                } else if (currentPrice < psar /*&& currentPrice < ema*/) {
+                    config.position[pair.pair].isInPosition = true;
+                    await placeOrder(sdk, config, pair.pair, false);
                 }
             }
         }
@@ -88,6 +90,10 @@ async function main() {
     async function handleFill(pair, fill) {
         if (config.position[pair].isInPosition && 
             fill.oid != config.position[pair].mainOrderId) {
+
+            console.log('filled order: ', fill);
+            console.log('isInPosition: ', config.position[pair].isInPosition);
+            console.log('saved mainOrderId: ', config.position[pair].mainOrderId);
             
             config.position[pair].isInPosition = false;
             updatePerformanceMetrics(config, pair, fill);
