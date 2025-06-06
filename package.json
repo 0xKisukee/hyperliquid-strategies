@@ -1,0 +1,22 @@
+{
+  "name": "hyperliquid-strategies",
+  "version": "1.0.0",
+  "description": "Trading strategies for Hyperliquid exchange",
+  "main": "index.js",
+  "scripts": {
+    "start:scalping": "node scalpingBot.js",
+    "start:psar": "node psarBot.js"
+  },
+  "keywords": [],
+  "author": "0xKisukee",
+  "license": "MIT",
+  "type": "commonjs",
+  "devDependencies": {
+    "husky": "^9.1.7"
+  },
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "hyperliquid": "^1.7.5",
+    "technicalindicators": "^3.1.0"
+  }
+}
