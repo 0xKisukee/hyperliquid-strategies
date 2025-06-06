@@ -6,11 +6,20 @@ const baseConfig = {
             {
                 coin: 'ETH',
                 pair: 'ETH-PERP',
-                positionSize: 20, // Size of each trade in USD
-                takeProfitPercentage: 0.001, // 0.5% take profit
+                positionSize: 50, // Size of each trade in USD
+                takeProfitPercentage: 0.005, // 0.5% take profit
                 riskRewardRatio: 2, // Risk-reward ratio
                 priceDecimals: 1, // Maximum decimal places for price
                 sizeDecimals: 4, // Maximum decimal places for size
+            },
+            {
+                coin: 'BTC',
+                pair: 'BTC-PERP',
+                positionSize: 50, // Size of each trade in USD
+                takeProfitPercentage: 0.004, // 0.5% take profit
+                riskRewardRatio: 2, // Risk-reward ratio
+                priceDecimals: 0, // Maximum decimal places for price
+                sizeDecimals: 5, // Maximum decimal places for size
             }
         ],
     },

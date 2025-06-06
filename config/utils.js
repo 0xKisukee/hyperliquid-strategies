@@ -81,7 +81,7 @@ async function placeOrder(sdk, config, pair, isBuy) {
         Number((entryPrice - takeProfitDistance).toFixed(pairConfig.priceDecimals));
 
     // Place stop loss order
-    const slOrderResult = await sdk.exchange.placeOrder({
+    await sdk.exchange.placeOrder({
         orders: [{
             coin: pair,
             is_buy: !isBuy,
@@ -99,7 +99,7 @@ async function placeOrder(sdk, config, pair, isBuy) {
     });
 
     // Place take profit order
-    const tpOrderResult = await sdk.exchange.placeOrder({
+    await sdk.exchange.placeOrder({
         orders: [{
             coin: pair,
             is_buy: !isBuy,

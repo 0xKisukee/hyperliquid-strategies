@@ -73,11 +73,11 @@ async function main() {
             const ema = calculateEMA(config.history[pair.pair].candles);
 
             // Trading logic based on PSAR and EMA
-            if (currentPrice > psar /*&& currentPrice > ema*/) {
+            if (currentPrice > psar && currentPrice > ema) {
                 config.position[pair.pair].isInPosition = true;
                 console.log('GONNA PLACE ORDER SO IN POSITION');
                 await placeOrder(sdk, config, pair.pair, true);
-            } else if (currentPrice < psar /*&& currentPrice < ema*/) {
+            } else if (currentPrice < psar && currentPrice < ema) {
                 config.position[pair.pair].isInPosition = true;
                 console.log('GONNA PLACE ORDER SO IN POSITION');
                 await placeOrder(sdk, config, pair.pair, false);
