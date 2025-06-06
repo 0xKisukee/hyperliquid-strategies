@@ -4,7 +4,7 @@ This repository contains automated trading strategies for the Hyperliquid exchan
 
 ## Strategies
 
-### 1. Scalping Bot
+### 1. RSI Bot
 A scalping strategy that uses RSI and SMA indicators to identify short-term trading opportunities.
 
 ### 2. PSAR Bot
@@ -28,7 +28,7 @@ MAIN_WALLET_ADDRESS=your_wallet_address
 
 Run the desired strategy:
 ```bash
-node scalpingBot.js
+node rsiBot.js
 # or
 node psarBot.js
 ```
