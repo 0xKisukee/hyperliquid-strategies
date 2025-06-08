@@ -20,8 +20,8 @@ async function main() {
         ...baseConfig,
         indicators: {
             rsiPeriod: 10,
-            rsiOverbought: 0, // 60
-            rsiOversold: 100, // 40
+            rsiOverbought: 60, // 60
+            rsiOversold: 40, // 40
             smaPeriod: 15
         }
     };
@@ -66,20 +66,17 @@ async function main() {
                 config.history[pair.pair].candles[config.history[pair.pair].candles.length - 1] = data;
             }
 
-            // Only proceed if we are not in a position
-            if (!config.position[pair.pair].isInPosition) {
-                const currentPrice = parseFloat(data.c);
-                const rsi = calculateRSI(config.history[pair.pair].candles);
-                const sma = calculateSMA(config.history[pair.pair].candles);
+            const currentPrice = parseFloat(data.c);
+            const rsi = calculateRSI(config.history[pair.pair].candles);
+            const sma = calculateSMA(config.history[pair.pair].candles);
 
-                // Trading logic
-                if (rsi < config.indicators.rsiOversold && currentPrice > sma) {
-                    config.position[pair.pair].isInPosition = true;
-                    await placeOrder(sdk, config, pair.pair, true);
-                } else if (rsi > config.indicators.rsiOverbought && currentPrice < sma) {
-                    config.position[pair.pair].isInPosition = true;
-                    await placeOrder(sdk, config, pair.pair, false);
-                }
+            // Trading logic based on RSI and SMA
+            if (rsi < config.indicators.rsiOversold && currentPrice > sma) {
+                config.position[pair.pair].isInPosition = true;
+                await placeOrder(sdk, config, pair.pair, true);
+            } else if (rsi > config.indicators.rsiOverbought && currentPrice < sma) {
+                config.position[pair.pair].isInPosition = true;
+                await placeOrder(sdk, config, pair.pair, false);
             }
         }
     }

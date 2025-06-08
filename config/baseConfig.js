@@ -6,8 +6,8 @@ const baseConfig = {
             {
                 coin: 'ETH',
                 pair: 'ETH-PERP',
-                positionSize: 50, // Size of each trade in USD
-                takeProfitPercentage: 0.005, // 0.5% take profit
+                positionSize: 1000, // Size of each trade in USD
+                takeProfitPercentage: 0.015, // 1.5% take profit
                 riskRewardRatio: 2, // Risk-reward ratio
                 priceDecimals: 1, // Maximum decimal places for price
                 sizeDecimals: 4, // Maximum decimal places for size
@@ -15,8 +15,17 @@ const baseConfig = {
             {
                 coin: 'BTC',
                 pair: 'BTC-PERP',
-                positionSize: 50, // Size of each trade in USD
-                takeProfitPercentage: 0.004, // 0.5% take profit
+                positionSize: 1000, // Size of each trade in USD
+                takeProfitPercentage: 0.01, // 1% take profit
+                riskRewardRatio: 2, // Risk-reward ratio
+                priceDecimals: 0, // Maximum decimal places for price
+                sizeDecimals: 5, // Maximum decimal places for size
+            },
+            {
+                coin: 'SOL',
+                pair: 'SOL-PERP',
+                positionSize: 1000, // Size of each trade in USD
+                takeProfitPercentage: 0.012, // 1% take profit
                 riskRewardRatio: 2, // Risk-reward ratio
                 priceDecimals: 0, // Maximum decimal places for price
                 sizeDecimals: 5, // Maximum decimal places for size
@@ -26,8 +35,8 @@ const baseConfig = {
 
     // Candle configuration
     candles: {
-        interval: '1m', // 1 minute candles
-        count: 100, // Number of candles to keep in history
+        interval: '1h', // 1 hour candles
+        count: 1000, // Number of candles to keep in history
     },
 
     // Performance tracking per pair

@@ -11,8 +11,16 @@ function initializeSDK() {
 
 // Fetch candle data using WebSocket
 async function fetchCandleData(sdk, coin, interval, count) {
+    const secondsInInterval = {
+        '1m': 60,
+        '5m': 300,
+        '15m': 900,
+        '30m': 1800,
+        '1h': 3600,
+    }
+
     const endTime = Date.now();
-    const startTime = endTime - (count * 60 * 1000);
+    const startTime = endTime - (count * secondsInInterval[interval] * 1000);
 
     const response = await sdk.subscriptions.postRequest('info', {
         type: 'candleSnapshot',
@@ -29,7 +37,7 @@ async function fetchCandleData(sdk, coin, interval, count) {
 
 // Unified order placement function that handles both order placement and risk management
 async function placeOrder(sdk, config, pair, isBuy) {
-    console.log('placing ' + (isBuy ? 'buy' : 'sell') + ' order on ' + pair);
+    console.log('Placing ' + (isBuy ? 'buy' : 'sell') + ' order on ' + pair);
 
     // Get L2 book for price information
     const l2Book = await sdk.info.getL2Book(pair);
@@ -60,11 +68,9 @@ async function placeOrder(sdk, config, pair, isBuy) {
     // Update mainOrderId immediately to prevent race conditions with fill events
     if (mainOrderStatus.filled) {
         config.position[pair].mainOrderId = mainOrderStatus.filled.oid;
-        console.log('Main order filled immediately with ID:', config.position[pair].mainOrderId);
         entryPrice = Number(mainOrderStatus.filled.avgPx);
     } else if (mainOrderStatus.resting) {
         config.position[pair].mainOrderId = mainOrderStatus.resting.oid;
-        console.log('Main order resting with ID:', config.position[pair].mainOrderId);
         entryPrice = orderPrice;
     }
 
@@ -146,7 +152,6 @@ async function initializeSubscriptions(sdk, config, onCandle, onFill) {
     for (const pair of config.trading.pairs) {
         sdk.subscriptions.subscribeToCandle(pair.pair, config.candles.interval, async (data) => {
             if (!config.position[pair.pair].isInPosition) {
-                console.log('NOT IN POSITION SO CALLING ON CANDLE');
                 await onCandle(pair, data);
             }
         });

@@ -23,8 +23,6 @@ async function main() {
     // Get updates anytime the user gets new fills
     sdk.subscriptions.subscribeToUserFills(process.env.MAIN_WALLET_ADDRESS, (data) => {
         if (!data.isSnapshot) {
-            console.log('Received user fills data:', data);
-
             if (data.fills[0].side == 'buy') {
 
                 // Place sell order
@@ -59,7 +57,6 @@ async function main() {
     // Get current market price for HYPE
     const l2Book = await sdk.info.getL2Book('HYPE-PERP');
     const currentPrice = parseFloat(l2Book.levels[0][0].px);
-    console.log(`Current price: ${currentPrice}`);
 
     // Calculate grid prices
     const gridPrices = [];
