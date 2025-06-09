@@ -4,8 +4,9 @@
   "description": "Trading strategies for Hyperliquid exchange",
   "main": "index.js",
   "scripts": {
-    "start:scalping": "node scalpingBot.js",
-    "start:psar": "node psarBot.js"
+    "start:scalping": "node robots/scalpingBot.js",
+    "start:psar": "node robots/psarBot.js",
+    "start:placePosition": "node tools/placePosition.js"
   },
   "keywords": [],
   "author": "0xKisukee",

@@ -1,14 +1,14 @@
 const technicalIndicators = require('technicalindicators');
 require("dotenv").config();
 
-const baseConfig = require('./config/baseConfig');
+const baseConfig = require('../config/baseConfig');
 const {
     initializeSDK,
     fetchCandleData,
     placeOrder,
     updatePerformanceMetrics,
     initializeSubscriptions
-} = require('./config/utils');
+} = require('../config/utils');
 
 async function main() {
     // Initialize the Hyperliquid SDK
@@ -19,33 +19,31 @@ async function main() {
     const config = {
         ...baseConfig,
         indicators: {
-            psarStep: 0.02, // Step size
-            psarMax: 0.2, // Maximum step size
-            emaPeriod: 90 // EMA period
+            rsiPeriod: 10,
+            rsiOverbought: 60, // 60
+            rsiOversold: 40, // 40
+            smaPeriod: 15
         }
     };
 
-    // Function to calculate PSAR
-    function calculatePSAR(candles) {
-        const highs = candles.map(candle => parseFloat(candle.h));
-        const lows = candles.map(candle => parseFloat(candle.l));
-        const psar = technicalIndicators.PSAR.calculate({
-            high: highs,
-            low: lows,
-            step: config.indicators.psarStep,
-            max: config.indicators.psarMax
+    // Function to calculate RSI
+    function calculateRSI(candles) {
+        const prices = candles.map(candle => parseFloat(candle.c));
+        const rsi = technicalIndicators.RSI.calculate({
+            values: prices,
+            period: config.indicators.rsiPeriod
         });
-        return psar[psar.length - 1];
+        return rsi[rsi.length - 1];
     }
 
-    // Function to calculate EMA
-    function calculateEMA(candles) {
+    // Function to calculate SMA
+    function calculateSMA(candles) {
         const prices = candles.map(candle => parseFloat(candle.c));
-        const ema = technicalIndicators.EMA.calculate({
+        const sma = technicalIndicators.SMA.calculate({
             values: prices,
-            period: config.indicators.emaPeriod
+            period: config.indicators.smaPeriod
         });
-        return ema[ema.length - 1];
+        return sma[sma.length - 1];
     }
 
     // Initialize data for all pairs
@@ -69,14 +67,14 @@ async function main() {
             }
 
             const currentPrice = parseFloat(data.c);
-            const psar = calculatePSAR(config.history[pair.pair].candles);
-            const ema = calculateEMA(config.history[pair.pair].candles);
+            const rsi = calculateRSI(config.history[pair.pair].candles);
+            const sma = calculateSMA(config.history[pair.pair].candles);
 
-            // Trading logic based on PSAR and EMA
-            if (currentPrice > psar && currentPrice > ema) {
+            // Trading logic based on RSI and SMA
+            if (rsi < config.indicators.rsiOversold && currentPrice > sma) {
                 config.position[pair.pair].isInPosition = true;
                 await placeOrder(sdk, config, pair.pair, true);
-            } else if (currentPrice < psar && currentPrice < ema) {
+            } else if (rsi > config.indicators.rsiOverbought && currentPrice < sma) {
                 config.position[pair.pair].isInPosition = true;
                 await placeOrder(sdk, config, pair.pair, false);
             }
